@@ -99,3 +99,52 @@ def email_verification_to_entity(model: EmailVerificationTokenModel) -> EmailVer
         used_at=model.used_at,
         created_at=model.created_at,
     )
+
+
+from app.domain.entities.document import Document
+from app.infrastructure.database.models.document import DocumentModel
+
+
+def document_to_entity(model: DocumentModel) -> Document:
+    if model is None:
+        return None
+    import json
+
+    metadata = json.loads(model.meta_payload) if model.meta_payload else None
+    return Document(
+        id=model.id,
+        filename=model.filename,
+        mime_type=model.mime_type,
+        size=model.size,
+        pages=model.pages,
+        owner_id=model.owner_id,
+        version=model.version,
+        storage_path=model.storage_path,
+        checksum=model.checksum,
+        status=model.status,
+        metadata=metadata,
+        created_at=model.created_at,
+        updated_at=model.updated_at,
+        deleted_at=model.deleted_at,
+    )
+
+
+def document_to_model(entity: Document) -> DocumentModel:
+    import json
+
+    return DocumentModel(
+        id=entity.id,
+        filename=entity.filename,
+        mime_type=entity.mime_type,
+        size=entity.size,
+        pages=entity.pages,
+        owner_id=entity.owner_id,
+        version=entity.version,
+        storage_path=entity.storage_path,
+        checksum=entity.checksum,
+        status=entity.status,
+        meta_payload=json.dumps(entity.metadata) if entity.metadata else None,
+        created_at=entity.created_at,
+        updated_at=entity.updated_at,
+        deleted_at=entity.deleted_at,
+    )

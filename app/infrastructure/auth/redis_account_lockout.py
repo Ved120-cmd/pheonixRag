@@ -13,22 +13,31 @@ class RedisAccountLockout(AccountLockout):
         return f"auth:lockout:locked:{identifier}"
 
     async def is_locked(self, key: str) -> bool:
-        client = get_redis_client()
-        return bool(await client.exists(self._lock_key(key)))
+        try:
+            client = get_redis_client()
+            return bool(await client.exists(self._lock_key(key)))
+        except Exception:
+            return False
 
     async def record_failure(self, key: str) -> None:
-        client = get_redis_client()
-        fail_key = self._fail_key(key)
-        failures = await client.incr(fail_key)
-        await client.expire(fail_key, settings.account_lockout_duration_seconds)
+        try:
+            client = get_redis_client()
+            fail_key = self._fail_key(key)
+            failures = await client.incr(fail_key)
+            await client.expire(fail_key, settings.account_lockout_duration_seconds)
 
-        if failures >= settings.account_lockout_threshold:
-            await client.setex(
-                self._lock_key(key),
-                settings.account_lockout_duration_seconds,
-                "1",
-            )
+            if failures >= settings.account_lockout_threshold:
+                await client.setex(
+                    self._lock_key(key),
+                    settings.account_lockout_duration_seconds,
+                    "1",
+                )
+        except Exception:
+            return
 
     async def clear(self, key: str) -> None:
-        client = get_redis_client()
-        await client.delete(self._fail_key(key), self._lock_key(key))
+        try:
+            client = get_redis_client()
+            await client.delete(self._fail_key(key), self._lock_key(key))
+        except Exception:
+            return

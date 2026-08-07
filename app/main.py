@@ -34,14 +34,27 @@ app = FastAPI(
 )
 
 register_exception_handlers(app)
-app.add_middleware(RequestLoggingMiddleware)
+allowed_origins = list(
+    dict.fromkeys(
+        [
+            *settings.cors_origins,
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://localhost:3001",
+            "http://127.0.0.1:3001",
+        ]
+    )
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=allowed_origins,
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
+app.add_middleware(RequestLoggingMiddleware)
 
 app.include_router(api_router, prefix="/api/v1")
 

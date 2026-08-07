@@ -72,6 +72,8 @@ Thumbs.db
 .env.local
 .vscode/settings.json
 .idea/
+health_diag.py
+CLAUDE.md
 
 # Docker
 .dockerignore

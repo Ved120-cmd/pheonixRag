@@ -114,7 +114,9 @@ class Settings(BaseSettings):
 
     # --- Frontend (for email links in mock service) ---
     frontend_url: str = "http://localhost:3000"
-    cors_origins: list[str] = Field(default=["http://localhost:3000"])
+    cors_origins: list[str] = Field(
+        default_factory=lambda: ["http://localhost:3000", "http://127.0.0.1:3000"]
+    )
 
     # --- Bootstrap admin (created by seed_iam if not exists) ---
     bootstrap_admin_email: str = "admin@phoenixrag.local"

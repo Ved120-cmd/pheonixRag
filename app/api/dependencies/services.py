@@ -25,6 +25,11 @@ from app.infrastructure.database.session import get_db_session
 from app.infrastructure.email.mock_email_service import MockEmailService
 from app.infrastructure.security.argon2_hasher import Argon2PasswordHasher
 from app.infrastructure.security.jwt_token_service import JWTTokenService
+from app.application.services.document_service import DocumentService
+from app.infrastructure.database.repositories.document_repository import (
+    SQLAlchemyDocumentRepository,
+)
+from app.infrastructure.storage.document_store import DocumentStore
 
 _password_hasher = Argon2PasswordHasher()
 _token_service = JWTTokenService()
@@ -78,4 +83,13 @@ async def get_admin_service(
     yield AdminService(
         user_repo=SQLAlchemyUserRepository(session),
         role_repo=SQLAlchemyRoleRepository(session),
+    )
+
+
+async def get_document_service(
+    session: AsyncSession = Depends(get_db_session),
+) -> AsyncGenerator[DocumentService, None]:
+    yield DocumentService(
+        repo=SQLAlchemyDocumentRepository(session),
+        store=DocumentStore(),
     )
