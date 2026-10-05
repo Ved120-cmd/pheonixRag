@@ -1,3 +1,6 @@
+import json
+
+from app.domain.entities.chunk import Chunk
 from app.domain.entities.permission import Permission
 from app.domain.entities.role import Role
 from app.domain.entities.token import (
@@ -12,6 +15,49 @@ from app.infrastructure.database.models.permission import PermissionModel
 from app.infrastructure.database.models.refresh_token import RefreshTokenModel
 from app.infrastructure.database.models.role import RoleModel
 from app.infrastructure.database.models.user import UserModel
+from app.infrastructure.database.models.chunk import ChunkModel
+
+
+def chunk_to_entity(model: ChunkModel) -> Chunk:
+    return Chunk(
+        id=model.id,
+        document_id=model.document_id,
+        document_version=model.document_version,
+        parent_chunk_id=model.parent_chunk_id,
+        chunk_index=model.chunk_index,
+        text=model.text,
+        token_count=model.token_count,
+        character_count=model.character_count,
+        page_numbers=json.loads(model.page_numbers or "[]"),
+        section_path=json.loads(model.section_path or "[]"),
+        document_metadata=json.loads(model.document_metadata or "{}"),
+        strategy=model.strategy,
+        configuration=json.loads(model.configuration),
+        content_hash=model.content_hash,
+        is_active=model.is_active,
+        created_at=model.created_at,
+    )
+
+
+def chunk_to_model(entity: Chunk) -> ChunkModel:
+    return ChunkModel(
+        id=entity.id,
+        document_id=entity.document_id,
+        document_version=entity.document_version,
+        parent_chunk_id=entity.parent_chunk_id,
+        chunk_index=entity.chunk_index,
+        text=entity.text,
+        token_count=entity.token_count,
+        character_count=entity.character_count,
+        page_numbers=json.dumps(entity.page_numbers),
+        section_path=json.dumps(entity.section_path),
+        document_metadata=json.dumps(entity.document_metadata),
+        strategy=entity.strategy,
+        configuration=json.dumps(entity.configuration, sort_keys=True),
+        content_hash=entity.content_hash,
+        is_active=entity.is_active,
+        created_at=entity.created_at,
+    )
 
 
 def permission_to_entity(model: PermissionModel) -> Permission:

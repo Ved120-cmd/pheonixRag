@@ -66,12 +66,36 @@ class Settings(BaseSettings):
     qdrant_http_port: int = 6333
     qdrant_grpc_port: int = 6334
     raw_qdrant_url: str | None = Field(default=None, alias="QDRANT_URL")
+    qdrant_api_key: str | None = Field(default=None, alias="QDRANT_API_KEY")
+    qdrant_collection_prefix: str = "phoenixrag"
+    qdrant_distance: Literal["cosine", "dot", "euclid"] = "cosine"
+    qdrant_indexing_batch_size: int = Field(default=128, gt=0)
+    qdrant_tenant_sharding: bool = True
 
     @property
     def qdrant_url(self) -> str:
         if self.raw_qdrant_url:
             return self.raw_qdrant_url
         return f"http://{self.qdrant_host}:{self.qdrant_http_port}"
+
+    # --- Embeddings ---
+    embedding_model_name: str = "BAAI/bge-small-en-v1.5"
+    embedding_model_version: str = "main"
+    embedding_dimension: int = 384
+    embedding_device: Literal["auto", "cpu", "cuda"] = "auto"
+    embedding_batch_size: int = 32
+    embedding_normalize: bool = True
+    embedding_max_input_tokens: int = 512
+    celery_broker_url: str | None = Field(default=None, alias="CELERY_BROKER_URL")
+    celery_result_backend: str | None = Field(default=None, alias="CELERY_RESULT_BACKEND")
+
+    @property
+    def effective_celery_broker_url(self) -> str:
+        return self.celery_broker_url or self.redis_url
+
+    @property
+    def effective_celery_result_backend(self) -> str:
+        return self.celery_result_backend or self.redis_url
 
     # --- MinIO ---
     minio_root_user: str = "phoenix"

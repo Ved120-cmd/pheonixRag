@@ -15,7 +15,7 @@ settings = get_settings()
 
 @lru_cache
 def get_qdrant_client() -> AsyncQdrantClient:
-    return AsyncQdrantClient(url=settings.qdrant_url)
+    return AsyncQdrantClient(url=settings.qdrant_url, api_key=settings.qdrant_api_key)
 
 
 async def check_qdrant_health() -> bool:
